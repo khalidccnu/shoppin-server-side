@@ -19,12 +19,12 @@ const mdbClient = new MongoClient(process.env.MONGODB_URI, {
 
 (async (_) => {
   try {
-    await mdbClient.connect();
     const products = mdbClient.db("shoppin").collection("products");
 
     app.get("/products", async (req, res) => {
       const cursor = products.find();
       const result = await cursor.toArray();
+
       res.send(result);
     });
 
