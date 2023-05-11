@@ -28,6 +28,14 @@ const mdbClient = new MongoClient(process.env.MONGODB_URI, {
       res.send(result);
     });
 
+    app.get("/products/featured", async (req, res) => {
+      const query = { featured: true };
+      const cursor = products.find(query);
+      const result = await cursor.toArray();
+
+      res.send(result);
+    });
+
     mdbClient
       .db("admin")
       .command({ ping: 1 })
