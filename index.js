@@ -21,6 +21,23 @@ const mdbClient = new MongoClient(process.env.MONGODB_URI, {
   try {
     const products = mdbClient.db("shoppin").collection("products");
 
+    app.get("/categories", async (req, res) => {
+      const uniqueCategories = [];
+      const options = {
+        projection: { _id: 0, category: 1 },
+      };
+
+      const cursor = products.find(_, options);
+      const result = await cursor.toArray();
+
+      result.forEach((product) => {
+        if (!uniqueCategories.includes(product.category))
+          uniqueCategories.push(product.category);
+      });
+
+      res.send(uniqueCategories);
+    });
+
     app.get("/products", async (req, res) => {
       const cursor = products.find();
       const result = await cursor.toArray();
