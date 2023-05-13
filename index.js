@@ -19,28 +19,33 @@ const mdbClient = new MongoClient(process.env.MONGODB_URI, {
 
 (async (_) => {
   try {
+    const categories = mdbClient.db("shoppin").collection("categories");
     const products = mdbClient.db("shoppin").collection("products");
 
     app.get("/categories", async (req, res) => {
-      const uniqueCategories = [];
-      const options = {
-        projection: { _id: 0, category: 1 },
-      };
+      let result;
 
-      const cursor = products.find(_, options);
-      const result = await cursor.toArray();
+      if (req.query.id) {
+        let query = { _id: new ObjectId(req.query.id) };
+        result = await categories.findOne(query);
+      } else {
+        const cursor = categories.find();
+        result = await cursor.toArray();
+      }
 
-      result.forEach((product) => {
-        if (!uniqueCategories.includes(product.category))
-          uniqueCategories.push(product.category);
-      });
-
-      res.send(uniqueCategories);
+      res.send(result);
     });
 
     app.get("/products", async (req, res) => {
-      const cursor = products.find();
-      const result = await cursor.toArray();
+      let result;
+
+      if (req.query.id) {
+        let query = { _id: new ObjectId(req.query.id) };
+        result = await products.findOne(query);
+      } else {
+        const cursor = products.find();
+        result = await cursor.toArray();
+      }
 
       res.send(result);
     });
@@ -57,13 +62,6 @@ const mdbClient = new MongoClient(process.env.MONGODB_URI, {
       const query = { discount: true };
       const cursor = products.find(query);
       const result = await cursor.toArray();
-
-      res.send(result);
-    });
-
-    app.get("/products/:id", async (req, res) => {
-      const query = { _id: new ObjectId(req.params.id) };
-      const result = await products.findOne(query);
 
       res.send(result);
     });
