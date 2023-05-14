@@ -22,11 +22,28 @@ const mdbClient = new MongoClient(process.env.MONGODB_URI, {
     const categories = mdbClient.db("shoppin").collection("categories");
     const products = mdbClient.db("shoppin").collection("products");
 
+    const shuffle = (arr) => {
+      let currentIndex = arr.length,
+        randomIndex;
+
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        [arr[currentIndex], arr[randomIndex]] = [
+          arr[randomIndex],
+          arr[currentIndex],
+        ];
+      }
+
+      return arr;
+    };
+
     app.get("/categories", async (req, res) => {
       let result;
 
       if (req.query.id) {
-        let query = { _id: new ObjectId(req.query.id) };
+        const query = { _id: new ObjectId(req.query.id) };
         result = await categories.findOne(query);
       } else {
         const cursor = categories.find();
@@ -40,8 +57,13 @@ const mdbClient = new MongoClient(process.env.MONGODB_URI, {
       let result;
 
       if (req.query.id) {
-        let query = { _id: new ObjectId(req.query.id) };
+        const query = { _id: new ObjectId(req.query.id) };
         result = await products.findOne(query);
+      } else if (req.query.cid) {
+        const query = { category_id: req.query.cid };
+        const cursor = products.find(query);
+        const arr = await cursor.toArray();
+        result = shuffle(arr);
       } else {
         const cursor = products.find();
         result = await cursor.toArray();
