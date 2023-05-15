@@ -8,6 +8,7 @@ const port = process.env.PORT || 5000;
 
 dotenv.config();
 app.use(cors());
+app.use(express.json());
 
 const mdbClient = new MongoClient(process.env.MONGODB_URI, {
   serverApi: {
@@ -21,6 +22,7 @@ const mdbClient = new MongoClient(process.env.MONGODB_URI, {
   try {
     const categories = mdbClient.db("shoppin").collection("categories");
     const products = mdbClient.db("shoppin").collection("products");
+    const users = mdbClient.db("shoppin").collection("users");
 
     const shuffle = (arr) => {
       let currentIndex = arr.length,
@@ -84,6 +86,13 @@ const mdbClient = new MongoClient(process.env.MONGODB_URI, {
       const query = { discount: true };
       const cursor = products.find(query);
       const result = await cursor.toArray();
+
+      res.send(result);
+    });
+
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await users.insertOne(user);
 
       res.send(result);
     });
