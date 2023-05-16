@@ -2,6 +2,7 @@ const dotenv = require("dotenv");
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -17,6 +18,28 @@ const mdbClient = new MongoClient(process.env.MONGODB_URI, {
     deprecationErrors: true,
   },
 });
+
+const verifyJWT = (req, res, next) => {
+  const authorization = req.headers.authorization;
+
+  if (!authorization) {
+    return res
+      .status(401)
+      .send({ error: true, message: "Unauthorized access!" });
+  }
+
+  const token = authorization.split(" ")[1];
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err) => {
+    if (err) {
+      return res
+        .status(403)
+        .send({ error: true, message: "Forbidden access!" });
+    }
+
+    next();
+  });
+};
 
 (async (_) => {
   try {
@@ -90,6 +113,19 @@ const mdbClient = new MongoClient(process.env.MONGODB_URI, {
       res.send(result);
     });
 
+    app.get("/users", verifyJWT, async (req, res) => {
+      const query = { _id: req.query.id };
+      const result = await users.findOne(query);
+
+      !result
+        ? res.send({
+            error: true,
+            status: 500,
+            statusText: "No value exist!",
+          })
+        : res.send(result);
+    });
+
     app.post("/users", async (req, res) => {
       const user = req.body;
       const result = await users.insertOne(user);
@@ -110,6 +146,16 @@ const mdbClient = new MongoClient(process.env.MONGODB_URI, {
 
 app.get("/", (req, res) => {
   res.send("Shoppin is running...");
+});
+
+app.post("/jwt", (req, res) => {
+  const userId = req.body;
+
+  const token = jwt.sign(userId, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "6h",
+  });
+
+  res.send(token);
 });
 
 app.listen(port, (_) => {
