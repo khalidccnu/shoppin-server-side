@@ -81,7 +81,9 @@ const verifyJWT = (req, res, next) => {
     app.get("/products", async (req, res) => {
       let result;
 
-      if (req.query.id) {
+      if (req.query.count) {
+        result = await products.countDocuments();
+      } else if (req.query.id) {
         const query = { _id: new ObjectId(req.query.id) };
         result = await products.findOne(query);
       } else if (req.query.cid) {
@@ -101,7 +103,7 @@ const verifyJWT = (req, res, next) => {
         result = await cursor.toArray();
       }
 
-      res.send(result);
+      res.send(req.query.count ? { totalProducts: result } : result);
     });
 
     app.get("/products/featured", async (req, res) => {
