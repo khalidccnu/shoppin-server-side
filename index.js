@@ -89,6 +89,13 @@ const verifyJWT = (req, res, next) => {
         const cursor = products.find(query);
         const arr = await cursor.toArray();
         result = shuffle(arr);
+      } else if (req.query.page && req.query.limit) {
+        let page = req.query.page;
+        let limit = +req.query.limit;
+        let skip = (page - 1) * limit;
+
+        const cursor = products.find().skip(skip).limit(limit);
+        result = await cursor.toArray();
       } else {
         const cursor = products.find();
         result = await cursor.toArray();
