@@ -122,6 +122,20 @@ const verifyJWT = (req, res, next) => {
       res.send(result);
     });
 
+    app.post("/products", async (req, res) => {
+      let result;
+
+      if (req.query.ids) {
+        const ids = req.body.map((id) => new ObjectId(id));
+
+        const query = { _id: { $in: ids } };
+        const cursor = products.find(query);
+        result = await cursor.toArray();
+      }
+
+      res.send(result);
+    });
+
     app.get("/users", verifyJWT, async (req, res) => {
       const query = { _id: req.query.id };
       const result = await users.findOne(query);
