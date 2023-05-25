@@ -156,6 +156,14 @@ const verifyJWT = (req, res, next) => {
       res.send(result);
     });
 
+    app.patch("/users", async (req, res) => {
+      const user = req.body;
+      const query = { _id: req.query.id };
+      const result = await users.updateOne(query, { $set: user });
+
+      res.send(result);
+    });
+
     mdbClient
       .db("admin")
       .command({ ping: 1 })
