@@ -46,6 +46,7 @@ const verifyJWT = (req, res, next) => {
     const categories = mdbClient.db("shoppin").collection("categories");
     const products = mdbClient.db("shoppin").collection("products");
     const users = mdbClient.db("shoppin").collection("users");
+    const orders = mdbClient.db("shoppin").collection("orders");
 
     const shuffle = (arr) => {
       let currentIndex = arr.length,
@@ -160,6 +161,13 @@ const verifyJWT = (req, res, next) => {
       const user = req.body;
       const query = { _id: req.query.id };
       const result = await users.updateOne(query, { $set: user });
+
+      res.send(result);
+    });
+
+    app.post("/orders", async (req, res) => {
+      const order = req.body;
+      const result = await orders.insertOne(order);
 
       res.send(result);
     });
