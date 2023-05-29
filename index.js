@@ -165,6 +165,16 @@ const verifyJWT = (req, res, next) => {
       res.send(result);
     });
 
+    app.get("/orders", async (req, res) => {
+      let result;
+
+      if (req.query.count) {
+        result = await orders.countDocuments();
+      }
+
+      res.send({ totalOrders: result });
+    });
+
     app.post("/orders", async (req, res) => {
       const order = req.body;
       const result = await orders.insertOne(order);
