@@ -4,11 +4,17 @@ const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
 
+dotenv.config();
+const corsOptions = {
+  origin: "*",
+  credentials: true,
+  optionSuccessStatus: 200,
+};
+
 const app = express();
 const port = process.env.PORT || 5000;
 
-dotenv.config();
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const mdbClient = new MongoClient(process.env.MONGODB_URI, {
