@@ -138,6 +138,8 @@ const verifyJWT = (req, res, next) => {
         const query = { _id: { $in: ids } };
         const cursor = products.find(query);
         result = await cursor.toArray();
+      } else {
+        result = await products.insertOne(req.body);
       }
 
       res.send(result);
