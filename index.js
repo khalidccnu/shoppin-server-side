@@ -196,9 +196,19 @@ const verifyJWT = (req, res, next) => {
         req.query.id ? (query = { ct_key: req.query.id }) : null;
 
         result = await orders.countDocuments(query);
+      } else if (req.query.page && req.query.limit) {
+        let page = req.query.page;
+        let limit = +req.query.limit;
+        let skip = (page - 1) * limit;
+
+        const cursor = orders.find().skip(skip).limit(limit);
+        result = await cursor.toArray();
+      } else {
+        const cursor = orders.find();
+        result = await cursor.toArray();
       }
 
-      res.send({ totalOrders: result });
+      res.send(req.query.count ? { totalOrders: result } : result);
     });
 
     app.post("/orders", async (req, res) => {
