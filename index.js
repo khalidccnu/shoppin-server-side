@@ -191,7 +191,11 @@ const verifyJWT = (req, res, next) => {
       let result;
 
       if (req.query.count) {
-        result = await orders.countDocuments();
+        let query = {};
+
+        req.query.id ? (query = { ct_key: req.query.id }) : null;
+
+        result = await orders.countDocuments(query);
       }
 
       res.send({ totalOrders: result });
