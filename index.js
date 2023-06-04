@@ -188,23 +188,22 @@ const verifyJWT = (req, res, next) => {
     });
 
     app.get("/orders", async (req, res) => {
-      let result;
+      let query = {},
+        result;
+
+      if (req.query.id) query = { ct_key: req.query.id };
 
       if (req.query.count) {
-        let query = {};
-
-        req.query.id ? (query = { ct_key: req.query.id }) : null;
-
         result = await orders.countDocuments(query);
       } else if (req.query.page && req.query.limit) {
         let page = req.query.page;
         let limit = +req.query.limit;
         let skip = (page - 1) * limit;
 
-        const cursor = orders.find().skip(skip).limit(limit);
+        const cursor = orders.find(query).skip(skip).limit(limit);
         result = await cursor.toArray();
       } else {
-        const cursor = orders.find();
+        const cursor = orders.find(query);
         result = await cursor.toArray();
       }
 
