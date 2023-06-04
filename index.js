@@ -145,6 +145,13 @@ const verifyJWT = (req, res, next) => {
       res.send(result);
     });
 
+    app.put("/products", async (req, res) => {
+      const query = { _id: new ObjectId(req.query.id) };
+      const result = await products.updateOne(query, { $set: req.body });
+
+      res.send(result);
+    });
+
     app.get("/users", verifyJWT, async (req, res) => {
       const query = { _id: req.query.id };
       const result = await users.findOne(query);
