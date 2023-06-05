@@ -1,18 +1,18 @@
-const dotenv = require("dotenv");
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
+const stripe = require("stripe")(process.env.STRIPE_SK);
 
-dotenv.config();
+const app = express();
+const port = process.env.PORT || 5000;
+
 const corsOptions = {
   origin: "*",
   credentials: true,
   optionSuccessStatus: 200,
 };
-
-const app = express();
-const port = process.env.PORT || 5000;
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -215,6 +215,18 @@ const verifyJWT = (req, res, next) => {
       const result = await orders.insertOne(order);
 
       res.send(result);
+    });
+
+    app.post("/create-payment-intent", async (req, res) => {
+      const amount = req.body.grandTotal * 100;
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount,
+        currency: "usd",
+        payment_method_types: ["card"],
+      });
+
+      res.send(paymentIntent.client_secret);
     });
 
     mdbClient
