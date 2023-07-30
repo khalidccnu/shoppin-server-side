@@ -236,7 +236,7 @@ const verifyJWT = (req, res, next) => {
   } catch (err) {
     console.log("Did not connect to MongoDB! " + err.message);
   } finally {
-    await mdbClient.close();
+    // await mdbClient.close();
   }
 })();
 
