@@ -10,6 +10,7 @@ const port = process.env.PORT || 5000;
 
 const corsOptions = {
   origin: "*",
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   credentials: true,
   optionSuccessStatus: 200,
 };
